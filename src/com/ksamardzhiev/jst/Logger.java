@@ -143,15 +143,18 @@ public class Logger implements AutoCloseable {
 	public String getFirstMessageAfter(Calendar moment) throws IOException, ParseException{
 		
 		this.logFileWriter.flush();//problem
-		InputStream is = new FileInputStream(this.logFile.toString());
-		Reader isr = new InputStreamReader(is);
-		try(BufferedReader logFileReader = new BufferedReader(isr)){
+		
+		try(InputStream is = new FileInputStream(this.logFile.toString());
+			Reader isr = new InputStreamReader(is);
+			BufferedReader logFileReader = new BufferedReader(isr)){
+			
 			String line;
 			while((line=logFileReader.readLine())!=null){
 				tsFORMAT.parse(line).getTime();
 				long milis = moment.getTimeInMillis();
 				if(milis>=moment.getTimeInMillis()){
 					return line;
+					
 				}
 			}
 		}
@@ -167,7 +170,7 @@ public class Logger implements AutoCloseable {
 		
 	}
 	
-	public String binSearch(Calendar moment, long left, long right) throws IOException{
+	private String binSearch(Calendar moment, long left, long right) throws IOException{
 		
 		if(left >= right){
 			this.indexFileChannel.position(left * this.INDEX_RECORD_SIZE);
@@ -177,9 +180,7 @@ public class Logger implements AutoCloseable {
 			
 			long millis = buf.getLong();
 			long offset = buf.getLong();
-			
-			
-			
+	
 			try(InputStream is = new FileInputStream(this.logFile.toString());
 					Reader isr = new InputStreamReader(is);
 					BufferedReader logFileReader = new BufferedReader(isr)){
